@@ -10,49 +10,39 @@ namespace XamarinWeterynarz
 {
     public partial class MainPage : ContentPage
     {
+        private readonly AnimalService animalService;
+        private readonly VisitFormatter visitFormatter;
+
         public MainPage()
         {
             InitializeComponent();
+            animalService = new AnimalService();
+            visitFormatter = new VisitFormatter();
         }
 
         private void Slider_ValueChanged(object sender, ValueChangedEventArgs e)
         {
             int wartosc = Convert.ToInt32(slider.Value);
-            
-            labelek.Text = Convert.ToString(wartosc);
-            
+            labelek.Text = wartosc.ToString();
         }
 
         private void ListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
         {
-            if(Convert.ToString(e.SelectedItem) == "Pies")
+            if (e.SelectedItem is string selectedSpecies)
             {
-                slider.Maximum = 18;
-
-            }
-
-            else if (Convert.ToString(e.SelectedItem) == "Kot")
-            {
-                slider.Maximum = 20;
-
-            }
-
-            else if (Convert.ToString(e.SelectedItem) == "Świnka Morska")
-            {
-                slider.Maximum = 9;
-
+                slider.Maximum = animalService.GetMaxAge(selectedSpecies);
             }
         }
 
         private void Button_Clicked(object sender, EventArgs e)
         {
-            string ImieNazwisko = ImieorazNazwisko.Text;
-            string Gatunek = Lista.SelectedItem.ToString();
-            string Ilelat = labelek.Text;
-            string CelWizyty = cel.Text;
+            string imieNazwisko = ImieorazNazwisko.Text;
+            string gatunek = Lista.SelectedItem?.ToString() ?? "Nieznany";
+            string ileLat = labelek.Text;
+            string celWizyty = cel.Text;
             string godzina = Czas.Time.ToString();
-            wypis.Text = $"Imie i nazwisko:{ImieNazwisko}, Gatunek:{Gatunek}, Wiek:{Ilelat}, Cel wizyty:{CelWizyty}, Godzina {godzina}";
 
+            wypis.Text = visitFormatter.FormatVisit(imieNazwisko, gatunek, ileLat, celWizyty, godzina);
         }
     }
 }
